@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 19
+    commands:
+      # Fazer login no Amazon ECR
+      - $(aws ecr get-login --no-include-email --region $AWS_REGION)
+
+  build:
+    commands:
+      # Definir o nome da imagem Docker
+      - IMAGE_NAME=$REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      # Construir a imagem Docker
+      - docker build -t $IMAGE_NAME .
+      # Empurrar a imagem Docker para o ECR
+      - docker push $IMAGE_NAME
+
+artifacts:
+  files: '**/*'
